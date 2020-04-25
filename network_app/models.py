@@ -36,4 +36,4 @@ class Post(models.Model):
         on_delete=models.SET_NULL,
         related_name='posts')
     published = models.DateTimeField(auto_now_add=True)
-    liked_by = models.ManyToManyField(NetworkUser)
+    liked_by = models.ManyToManyField(NetworkUser, related_name='liked_posts', blank=True)

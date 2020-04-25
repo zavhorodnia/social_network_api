@@ -9,11 +9,11 @@ urlpatterns = [
 
     path('token/refresh/', jwt_views.TokenRefreshSlidingView.as_view(), name='token_refresh'),
 
-    path('users/', views.Users.as_view(), name="users"),
+    path('users/', views.NetworkUsers.as_view(), name="users"),
     # path('users/<int:user_id>/activity/', views.UserActivity.as_view(), name="user_activity"),
-    # path('users/<int:user_id>/posts/', views.PostsByUser.as_view(), name="posts_by_user"),
+    path('users/<int:user_id>/posts/', views.PostsByUser.as_view(), name="posts_by_user"),
     path('posts/', views.PostView.as_view(), name="create_user"),
-    # path('posts/<int:post_id>/like/', views.LikePost.as_view(), name="like_post"),
-    # path('posts/<int:post_id>/unlike/', views.UnlikePost.as_view(), name="unlike_post"),
+    path('posts/<int:post_id>/like/', views.LikePost.as_view(), name="like_post"),
+    path('posts/<int:post_id>/unlike/', views.UnlikePost.as_view(), name="unlike_post"),
     # path('analytics/', views.Analytics.as_view(), name="analytics"),
 ]

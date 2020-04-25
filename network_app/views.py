@@ -48,3 +48,39 @@ class NetworkUsers(APIView):
         users = NetworkUser.objects.all()
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class PostsByUser(APIView):
+    def get(self, request, user_id):
+        try:
+            user = NetworkUser.objects.get(id=user_id)
+        except NetworkUser.DoesNotExist:
+            return Response('Wrong user id', status=status.HTTP_400_BAD_REQUEST)
+        posts = user.posts
+        serializer = PostSerializer(posts, many=True)
+        return Response(serializer.data)
+
+
+class LikePost(APIView):
+    def post(self, request, post_id):
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            return Response("Wrong post id", status=status.HTTP_400_BAD_REQUEST)
+        post.liked_by.add(request.user)
+        post.save()
+        serializer = PostSerializer(post)
+        return Response(serializer.data)
+
+
+class UnlikePost(APIView):
+    def post(self, request, post_id):
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            return Response("Wrong post id", status=status.HTTP_400_BAD_REQUEST)
+        if request.user in post.liked_by.all():
+            post.liked_by.remove(request.user)
+            post.save()
+        serializer = PostSerializer(post)
+        return Response(serializer.data)
