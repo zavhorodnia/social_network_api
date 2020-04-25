@@ -3,7 +3,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView
 from .serializers import (
-    UserRegistrationSerializer, UserLoginSerializer, UserSerializer, PostSerializer)
+    UserRegistrationSerializer, UserLoginSerializer, UserSerializer,
+    UserActivitySerializer, PostSerializer)
 from .models import Post, NetworkUser
 
 
@@ -83,4 +84,14 @@ class UnlikePost(APIView):
             post.liked_by.remove(request.user)
             post.save()
         serializer = PostSerializer(post)
+        return Response(serializer.data)
+
+
+class UserActivity(APIView):
+    def get(self, request, user_id):
+        try:
+            user = NetworkUser.objects.get(id=user_id)
+        except NetworkUser.DoesNotExist:
+            return Response("Wrong user id", status=status.HTTP_400_BAD_REQUEST)
+        serializer = UserActivitySerializer(user)
         return Response(serializer.data)

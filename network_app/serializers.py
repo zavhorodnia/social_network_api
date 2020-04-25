@@ -60,3 +60,9 @@ class UserSerializer(serializers.ModelSerializer):
         model = NetworkUser
         fields = ['id', 'username', 'posts'] # , 'liked_posts']
         # extra_kwargs = {'liked_posts': {'required': False}}
+
+
+class UserActivitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NetworkUser
+        fields = ['last_login', 'last_request']

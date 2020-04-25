@@ -13,7 +13,7 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, username, password):
-        if username is None or password is None:
+        if not username or not password:
             raise TypeError('Username and password are required fields')
 
         user = self.create_user(username, password)
@@ -25,6 +25,8 @@ class UserManager(BaseUserManager):
 
 
 class NetworkUser(AbstractUser):
+    last_request = models.DateTimeField(auto_now_add=True)
+
     objects = UserManager()
 
 
