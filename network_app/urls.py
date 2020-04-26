@@ -15,5 +15,5 @@ urlpatterns = [
     path('posts/', views.PostView.as_view(), name="create_user"),
     path('posts/<int:post_id>/like/', views.LikePost.as_view(), name="like_post"),
     path('posts/<int:post_id>/unlike/', views.UnlikePost.as_view(), name="unlike_post"),
-    # path('analytics/', views.Analytics.as_view(), name="analytics"),
+    path('analytics/', views.Analytics.as_view(), name="analytics"),
 ]

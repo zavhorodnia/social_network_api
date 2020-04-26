@@ -1,6 +1,6 @@
 from rest_framework_simplejwt.serializers import TokenObtainSlidingSerializer
 from rest_framework import serializers
-from .models import Post, NetworkUser
+from .models import Post, NetworkUser, Like
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
@@ -14,7 +14,13 @@ class PostSerializer(serializers.ModelSerializer):
         fields = ['id', 'text', 'author', 'published', 'likes_count']
 
     def get_likes_count(self, obj):
-        return obj.liked_by.count()
+        return obj.likes.count()
+
+
+class LikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Like
+        fields = ['post', 'user', 'date']
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -53,7 +59,7 @@ class UserLoginSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    # liked_posts = PostSerializer(many=True, read_only=True)
+    # liked_posts = LikeSerializer(many=True, read_only=True)
     posts = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
@@ -63,6 +69,9 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserActivitySerializer(serializers.ModelSerializer):
+    last_login = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S")
+    last_request = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S")
+
     class Meta:
         model = NetworkUser
         fields = ['last_login', 'last_request']

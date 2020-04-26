@@ -4,8 +4,9 @@ from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView
 from .serializers import (
     UserRegistrationSerializer, UserLoginSerializer, UserSerializer,
-    UserActivitySerializer, PostSerializer)
-from .models import Post, NetworkUser
+    UserActivitySerializer, PostSerializer, LikeSerializer)
+from .models import Post, NetworkUser, Like
+from datetime import date, datetime
 
 
 class UserSignup(APIView):
@@ -66,10 +67,12 @@ class LikePost(APIView):
     def post(self, request, post_id):
         try:
             post = Post.objects.get(id=post_id)
+            post.likes.get(user_id=request.user.id)
         except Post.DoesNotExist:
             return Response("Wrong post id", status=status.HTTP_400_BAD_REQUEST)
-        post.liked_by.add(request.user)
-        post.save()
+        except Like.DoesNotExist:
+            like = Like(user=request.user, post=post)
+            like.save()
         serializer = PostSerializer(post)
         return Response(serializer.data)
 
@@ -78,11 +81,12 @@ class UnlikePost(APIView):
     def post(self, request, post_id):
         try:
             post = Post.objects.get(id=post_id)
+            like = post.likes.get(user_id=request.user.id)
+            like.delete()
         except Post.DoesNotExist:
             return Response("Wrong post id", status=status.HTTP_400_BAD_REQUEST)
-        if request.user in post.liked_by.all():
-            post.liked_by.remove(request.user)
-            post.save()
+        except Like.DoesNotExist:
+            pass
         serializer = PostSerializer(post)
         return Response(serializer.data)
 
@@ -94,4 +98,18 @@ class UserActivity(APIView):
         except NetworkUser.DoesNotExist:
             return Response("Wrong user id", status=status.HTTP_400_BAD_REQUEST)
         serializer = UserActivitySerializer(user)
+        return Response(serializer.data)
+
+
+class Analytics(APIView):
+    def get(self, request):
+        try:
+            date_str = request.GET.get('date_from', '1-1-1970')
+            date_from = datetime.strptime(date_str, '%d-%m-%Y').date()
+            date_str = request.GET.get('date_to', date.today().strftime('%d-%m-%Y'))
+            date_to = datetime.strptime(date_str, '%d-%m-%Y').date()
+        except ValueError:
+            return Response('Invalid request format', status=status.HTTP_400_BAD_REQUEST)
+        likes = Like.objects.filter(date__range=[date_from, date_to])
+        serializer = LikeSerializer(likes, many=True)
         return Response(serializer.data)

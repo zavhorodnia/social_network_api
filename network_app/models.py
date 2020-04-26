@@ -38,4 +38,9 @@ class Post(models.Model):
         on_delete=models.SET_NULL,
         related_name='posts')
     published = models.DateTimeField(auto_now_add=True)
-    liked_by = models.ManyToManyField(NetworkUser, related_name='liked_posts', blank=True)
+
+
+class Like(models.Model):
+    user = models.ForeignKey(NetworkUser, null=True, on_delete=models.SET_NULL)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='likes')
+    date = models.DateField(auto_now_add=True)
