@@ -59,13 +59,11 @@ class UserLoginSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    # liked_posts = LikeSerializer(many=True, read_only=True)
     posts = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = NetworkUser
-        fields = ['id', 'username', 'posts'] # , 'liked_posts']
-        # extra_kwargs = {'liked_posts': {'required': False}}
+        fields = ['id', 'username', 'posts']
 
 
 class UserActivitySerializer(serializers.ModelSerializer):
